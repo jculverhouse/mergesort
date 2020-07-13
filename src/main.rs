@@ -1,5 +1,24 @@
 use std::env;
 
+#[test]
+fn check_mergesort() {
+    let letters = vec!["s", "a", "m", "p", "l", "e"];
+    let shouldbe = vec!["a", "e", "l", "m", "p", "s"];
+    let sorted = mergesort(letters);
+    assert_eq!(sorted, shouldbe);
+
+    let words = vec![
+        "now", "is", "the", "time", "for", "all", "good", "men", "to", "come", "to", "the", "aid",
+        "of", "their", "country",
+    ];
+    let shouldbe = vec![
+        "aid", "all", "come", "country", "for", "good", "is", "men", "now", "of", "the", "the",
+        "their", "time", "to", "to",
+    ];
+    let sorted = mergesort(words);
+    assert_eq!(sorted, shouldbe);
+}
+
 /// Adapted from reading "Algorithms" by Jeff Erickson
 /// freely available on http://jeffe.cs.illinois.edu/teaching/algorithms/
 pub fn main() {
@@ -13,27 +32,26 @@ pub fn main() {
         return;
     }
 
-    let mut words: Vec<String> = Vec::with_capacity(args.len());
-    words.extend_from_slice(&args[1..]);
+    let words: Vec<&str> = args.iter().skip(1).map(AsRef::as_ref).collect();
     println!("Arrived: {:?}", words);
 
-    let words: Vec<String> = mergesort(words);
+    let words = mergesort(words);
     println!("Sorted: {:?}", words);
 }
 
 /// Mergesort
 /// Section 1.4, page 27
-pub fn mergesort(words: Vec<String>) -> Vec<String> {
+pub fn mergesort(words: Vec<&str>) -> Vec<&str> {
     if words.len() < 2 {
         return words;
     }
 
     let midpoint = (words.len() + 1) / 2;
-    let mut left: Vec<String> = Vec::with_capacity(midpoint);
+    let mut left: Vec<&str> = Vec::new();
     left.extend_from_slice(&words[..midpoint]);
     let left = mergesort(left);
 
-    let mut right: Vec<String> = Vec::with_capacity(words.len() - midpoint);
+    let mut right: Vec<&str> = Vec::new();
     right.extend_from_slice(&words[midpoint..]);
     let right = mergesort(right);
 
@@ -44,11 +62,11 @@ pub fn mergesort(words: Vec<String>) -> Vec<String> {
     return words;
 }
 
-pub fn merge(words: Vec<String>, midpoint: usize) -> Vec<String> {
+pub fn merge(words: Vec<&str>, midpoint: usize) -> Vec<&str> {
     let mut left_index = 0;
     let mut right_index = midpoint;
     let size = words.len();
-    let mut sorted: Vec<String> = Vec::with_capacity(size);
+    let mut sorted: Vec<&str> = Vec::new();
 
     for _ in 0..size {
         if right_index >= size {
