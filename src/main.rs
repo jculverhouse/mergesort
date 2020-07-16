@@ -32,11 +32,11 @@ pub fn main() {
         return;
     }
 
-    let words: Vec<&str> = args.iter().skip(1).map(AsRef::as_ref).collect();
+    let words = args.iter().skip(1).map(AsRef::as_ref).collect();
     println!("Arrived: {:?}", words);
 
-    let words = mergesort(words);
-    println!("Sorted: {:?}", words);
+    let sorted = mergesort(words);
+    println!("Sorted: {:?}", sorted);
 }
 
 /// Mergesort
@@ -47,39 +47,35 @@ pub fn mergesort(words: Vec<&str>) -> Vec<&str> {
     }
 
     let midpoint = (words.len() + 1) / 2;
-    let mut left: Vec<&str> = Vec::new();
-    left.extend_from_slice(&words[..midpoint]);
-    let left = mergesort(left);
+    let (left, right) = words.split_at(midpoint);
 
-    let mut right: Vec<&str> = Vec::new();
-    right.extend_from_slice(&words[midpoint..]);
-    let right = mergesort(right);
+    let left = mergesort(left.to_vec());
+    let right = mergesort(right.to_vec());
 
-    let mut words = left;
-    words.extend(right);
+    let halfsort = [left, right].concat();
+    let sorted = merge(halfsort, midpoint);
 
-    let words = merge(words, midpoint);
-    return words;
+    return sorted;
 }
 
 pub fn merge(words: Vec<&str>, midpoint: usize) -> Vec<&str> {
+    let size = words.len();
     let mut left_index = 0;
     let mut right_index = midpoint;
-    let size = words.len();
     let mut sorted: Vec<&str> = Vec::new();
 
     for _ in 0..size {
         if right_index >= size {
-            sorted.push(words[left_index].clone());
+            sorted.push(&words[left_index]);
             left_index += 1;
         } else if left_index >= midpoint {
-            sorted.push(words[right_index].clone());
+            sorted.push(&words[right_index]);
             right_index += 1;
         } else if words[left_index] < words[right_index] {
-            sorted.push(words[left_index].clone());
+            sorted.push(&words[left_index]);
             left_index += 1;
         } else {
-            sorted.push(words[right_index].clone());
+            sorted.push(&words[right_index]);
             right_index += 1;
         }
     }
